@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Russian Transliteration Trainer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <header>
+      <div class="title">Cyrillic <span>→</span> Latin Trainer</div>
+      <div class="stats">
+        <div class="stat">
+          Score: <span class="stat-value" id="score">0</span>/<span class="stat-value" id="total-answered">0</span>
+        </div>
+        <div class="stat">
+          🔥 <span class="stat-value streak" id="streak">0</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="filter-group"></div>
+      <button class="ref-toggle-btn" id="ref-toggle-btn">Alphabet reference</button>
+    </div>
+
+    <div class="ref-panel">
+      <h3>Cyrillic Alphabet Transliteration Guide</h3>
+      <div class="ref-grid"></div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+    <div class="word-count" id="word-count">Word 1 of …</div>
+
+    <div class="card" id="game-card">
+      <div class="category-badge" id="category-badge">Category</div>
+      <div class="russian-word" id="russian-word">…</div>
+
+      <div class="input-area">
+        <input
+          type="text"
+          id="answer-input"
+          placeholder="Type the transliteration…"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        >
+        <button id="submit-btn">Check</button>
+      </div>
+
+      <div class="result hidden" id="result">
+        <div class="result-status" id="result-status"></div>
+        <div class="result-details" id="result-details"></div>
+        <div class="english-meaning" id="english-meaning"></div>
+        <button id="next-btn">Next →</button>
+      </div>
+    </div>
+
+    <div class="hint-area" id="hint-area">
+      <button id="hint-btn">Show hint</button>
+      <div class="hint-text hidden" id="hint-text"></div>
+    </div>
+
+    <div class="end-screen hidden" id="end-screen">
+      <h2>Round Complete!</h2>
+      <div class="final-score" id="final-score">—</div>
+      <div class="final-pct" id="final-pct"></div>
+      <div class="final-msg" id="final-msg"></div>
+      <div class="final-streak" id="final-streak"></div>
+      <button id="restart-btn">Play Again</button>
+    </div>
+
+  </div>
+
+  <script src="words.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
