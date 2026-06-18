@@ -721,7 +721,7 @@ header {
 
 .lb-cols {
   display: grid;
-  grid-template-columns: 36px 36px 1fr 52px 56px;
+  grid-template-columns: 36px 36px 1fr 90px;
   padding: 8px 20px;
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -739,7 +739,7 @@ header {
 
 .lb-row {
   display: grid;
-  grid-template-columns: 36px 36px 1fr 52px 56px;
+  grid-template-columns: 36px 36px 1fr 90px;
   align-items: center;
   padding: 10px 20px;
   font-size: 0.9rem;
@@ -776,9 +776,7 @@ header {
 
 .lb-you { font-weight: 400; color: var(--accent); }
 
-.lb-pct { font-weight: 700; color: var(--accent); }
-
-.lb-words { font-size: 0.8rem; color: var(--text-muted); }
+.lb-streak { font-weight: 700; color: #f59e0b; }
 
 .lb-empty {
   text-align: center;

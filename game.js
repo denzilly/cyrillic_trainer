@@ -202,18 +202,23 @@ async function showEndScreen() {
 
   const saveEl = $('save-status');
   if (currentUser) {
-    saveEl.textContent = 'Saving score…';
+    saveEl.textContent = 'Saving…';
     saveEl.className = 'save-status saving';
-    const result = await saveScore(score, total, pct, maxStreak);
-    if (result === 'saved') {
-      saveEl.textContent = '✓ Score saved to leaderboard!';
+    const result = await saveStreak(maxStreak);
+    if (result === 'new-record') {
+      saveEl.textContent = `🏆 New personal best: ${maxStreak} streak!`;
       saveEl.className = 'save-status saved';
+    } else if (result === 'no-change') {
+      saveEl.textContent = `✓ Streak saved (best: ${maxStreak})`;
+      saveEl.className = 'save-status saved';
+    } else if (result === 'skipped') {
+      saveEl.textContent = '';
     } else {
-      saveEl.textContent = '✗ Could not save score.';
+      saveEl.textContent = '✗ Could not save streak.';
       saveEl.className = 'save-status save-error';
     }
   } else {
-    saveEl.innerHTML = '<button class="save-signin-btn" onclick="signIn()">Sign in with Google to save score</button>';
+    saveEl.innerHTML = '<button class="save-signin-btn" onclick="signIn()">Sign in to save your streak</button>';
     saveEl.className = 'save-status';
   }
 }

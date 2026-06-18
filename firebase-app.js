@@ -45,7 +45,6 @@ async function loadNickname(uid) {
       userNickname = doc.data().nickname;
       renderAuthUI(currentUser);
     } else {
-      // No nickname yet — prompt
       showNicknameModal(false);
     }
   } catch (err) {
@@ -77,18 +76,9 @@ async function submitNickname() {
   const err = document.getElementById('nickname-error');
   const nickname = input.value.trim();
 
-  if (nickname.length < 2) {
-    err.textContent = 'Must be at least 2 characters.';
-    return;
-  }
-  if (nickname.length > 20) {
-    err.textContent = 'Maximum 20 characters.';
-    return;
-  }
-  if (!/^[\w\s\-]+$/.test(nickname)) {
-    err.textContent = 'Letters, numbers, spaces, _ and - only.';
-    return;
-  }
+  if (nickname.length < 2) { err.textContent = 'Must be at least 2 characters.'; return; }
+  if (nickname.length > 20) { err.textContent = 'Maximum 20 characters.'; return; }
+  if (!/^[\w\s\-]+$/.test(nickname)) { err.textContent = 'Letters, numbers, spaces, _ and - only.'; return; }
 
   const btn = document.getElementById('nickname-submit-btn');
   btn.disabled = true;
@@ -125,21 +115,27 @@ function renderAuthUI(user) {
   }
 }
 
-async function saveScore(score, total, pct, maxStreak) {
+// Returns 'not-signed-in' | 'skipped' | 'new-record' | 'no-change' | 'error'
+async function saveStreak(streak) {
   if (!currentUser) return 'not-signed-in';
+  if (streak === 0) return 'skipped';
+
+  const ref = _db.collection('streaks').doc(currentUser.uid);
   try {
-    await _db.collection('scores').add({
+    const doc = await ref.get();
+    const prevBest = doc.exists ? (doc.data().bestStreak || 0) : 0;
+    const isNewRecord = streak > prevBest;
+
+    await ref.set({
       uid: currentUser.uid,
-      nickname: userNickname || currentUser.displayName || 'Anonymous',
-      score,
-      total,
-      pct,
-      maxStreak,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      nickname: userNickname || 'Anonymous',
+      bestStreak: Math.max(streak, prevBest),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
-    return 'saved';
+
+    return isNewRecord ? 'new-record' : 'no-change';
   } catch (err) {
-    console.error('Save score error:', err);
+    console.error('Save streak error:', err);
     return 'error';
   }
 }
@@ -151,28 +147,23 @@ async function openLeaderboard() {
   document.getElementById('lb-personal').innerHTML = '';
 
   try {
-    const snapshot = await _db.collection('scores')
-      .orderBy('pct', 'desc')
+    const snapshot = await _db.collection('streaks')
+      .orderBy('bestStreak', 'desc')
       .limit(10)
       .get();
-    const topScores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const topStreaks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     let myBest = null;
     if (currentUser) {
-      const mySnap = await _db.collection('scores')
-        .where('uid', '==', currentUser.uid)
-        .get();
-      if (!mySnap.empty) {
-        const mine = mySnap.docs.map(d => d.data());
-        myBest = mine.reduce((best, s) => s.pct > best.pct ? s : best, mine[0]);
-      }
+      const myDoc = await _db.collection('streaks').doc(currentUser.uid).get();
+      if (myDoc.exists) myBest = myDoc.data().bestStreak || 0;
     }
 
-    renderLeaderboardData(topScores, myBest);
+    renderLeaderboardData(topStreaks, myBest);
   } catch (err) {
     console.error('Leaderboard error:', err);
     document.getElementById('lb-body').innerHTML =
-      '<div class="lb-empty">Could not load scores — try again later.</div>';
+      '<div class="lb-empty">Could not load — try again later.</div>';
   }
 }
 
@@ -181,18 +172,18 @@ function closeLeaderboard() {
   document.body.style.overflow = '';
 }
 
-function renderLeaderboardData(scores, myBest) {
+function renderLeaderboardData(streaks, myBest) {
   const body = document.getElementById('lb-body');
   const personal = document.getElementById('lb-personal');
   const medals = ['🥇', '🥈', '🥉'];
   const myUid = currentUser ? currentUser.uid : null;
 
-  if (scores.length === 0) {
-    body.innerHTML = '<div class="lb-empty">No scores yet — be the first!</div>';
+  if (streaks.length === 0) {
+    body.innerHTML = '<div class="lb-empty">No streaks yet — be the first!</div>';
   } else {
-    body.innerHTML = scores.map((s, i) => {
+    body.innerHTML = streaks.map((s, i) => {
       const isMe = s.uid === myUid;
-      const name = s.nickname || s.displayName || 'Anonymous';
+      const name = s.nickname || 'Anonymous';
       const initials = name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
       const rank = medals[i] || `${i + 1}`;
       return `
@@ -200,18 +191,17 @@ function renderLeaderboardData(scores, myBest) {
           <span class="lb-rank">${rank}</span>
           <span class="lb-avatar">${initials}</span>
           <span class="lb-name">${escHtml(name)}${isMe ? ' <span class="lb-you">(you)</span>' : ''}</span>
-          <span class="lb-pct">${s.pct}%</span>
-          <span class="lb-words">${s.score}/${s.total}</span>
+          <span class="lb-streak">${s.bestStreak} 🔥</span>
         </div>`;
     }).join('');
   }
 
-  if (myBest) {
-    personal.innerHTML = `<div class="lb-personal-best">Your personal best: <strong>${myBest.pct}%</strong> — ${myBest.score}/${myBest.total} words</div>`;
+  if (myBest !== null) {
+    personal.innerHTML = `<div class="lb-personal-best">Your best streak: <strong>${myBest} 🔥</strong></div>`;
   } else if (currentUser) {
     personal.innerHTML = '<div class="lb-personal-best">Complete a round to appear on the leaderboard!</div>';
   } else {
-    personal.innerHTML = `<div class="lb-personal-best"><button class="lb-signin-prompt" onclick="signIn()">Sign in with Google to save your scores</button></div>`;
+    personal.innerHTML = `<div class="lb-personal-best"><button class="lb-signin-prompt" onclick="signIn()">Sign in with Google to save your streaks</button></div>`;
   }
 }
 
