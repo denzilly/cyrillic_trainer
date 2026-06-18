@@ -11,19 +11,32 @@
 
     <header>
       <div class="title">Cyrillic <span>→</span> Latin Trainer</div>
-      <div class="stats">
-        <div class="stat">
-          Score: <span class="stat-value" id="score">0</span>/<span class="stat-value" id="total-answered">0</span>
+      <div class="header-right">
+        <div class="stats">
+          <div class="stat">
+            Score: <span class="stat-value" id="score">0</span>/<span class="stat-value" id="total-answered">0</span>
+          </div>
+          <div class="stat">
+            🔥 <span class="stat-value streak" id="streak">0</span>
+          </div>
         </div>
-        <div class="stat">
-          🔥 <span class="stat-value streak" id="streak">0</span>
+        <div class="auth-section">
+          <button class="auth-signin-btn" id="auth-signin-btn" onclick="signIn()">Sign in</button>
+          <div class="auth-user-widget" id="auth-user-widget" style="display:none">
+            <img class="auth-photo" id="auth-photo" src="" alt="">
+            <span class="auth-name" id="auth-name"></span>
+            <button class="auth-signout-btn" onclick="signOutUser()">Sign out</button>
+          </div>
         </div>
       </div>
     </header>
 
     <div class="toolbar">
       <div class="filter-group"></div>
-      <button class="ref-toggle-btn" id="ref-toggle-btn">Alphabet reference</button>
+      <div class="toolbar-btns">
+        <button class="ref-toggle-btn" id="ref-toggle-btn">Alphabet</button>
+        <button class="lb-btn" onclick="openLeaderboard()">🏆 Leaderboard</button>
+      </div>
     </div>
 
     <div class="ref-panel">
@@ -72,11 +85,38 @@
       <div class="final-pct" id="final-pct"></div>
       <div class="final-msg" id="final-msg"></div>
       <div class="final-streak" id="final-streak"></div>
-      <button id="restart-btn">Play Again</button>
+      <div class="save-status" id="save-status"></div>
+      <div class="end-btns">
+        <button id="restart-btn">Play Again</button>
+        <button class="lb-btn-end" onclick="openLeaderboard()">🏆 Leaderboard</button>
+      </div>
     </div>
 
   </div>
 
+  <!-- Leaderboard Modal -->
+  <div class="lb-modal" id="lb-modal">
+    <div class="lb-card">
+      <div class="lb-header">
+        <span>🏆 Global Leaderboard</span>
+        <button class="lb-close" onclick="closeLeaderboard()">✕</button>
+      </div>
+      <div class="lb-cols">
+        <span></span><span></span>
+        <span>Player</span><span>Score</span><span>Words</span>
+      </div>
+      <div class="lb-body" id="lb-body"></div>
+      <div class="lb-personal" id="lb-personal"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+  <script src="firebase-app.js"></script>
   <script src="words.js"></script>
   <script src="game.js"></script>
 </body>

@@ -180,7 +180,7 @@ function nextWord() {
   }
 }
 
-function showEndScreen() {
+async function showEndScreen() {
   $('game-card').style.display = 'none';
   $('hint-area').style.display = 'none';
   $('end-screen').classList.remove('hidden');
@@ -199,6 +199,23 @@ function showEndScreen() {
   else if (pct >= 55) msg = 'Good effort. Practice makes perfect.';
   else msg = 'Keep at it — you will improve!';
   $('final-msg').textContent = msg;
+
+  const saveEl = $('save-status');
+  if (currentUser) {
+    saveEl.textContent = 'Saving score…';
+    saveEl.className = 'save-status saving';
+    const result = await saveScore(score, total, pct, maxStreak);
+    if (result === 'saved') {
+      saveEl.textContent = '✓ Score saved to leaderboard!';
+      saveEl.className = 'save-status saved';
+    } else {
+      saveEl.textContent = '✗ Could not save score.';
+      saveEl.className = 'save-status save-error';
+    }
+  } else {
+    saveEl.innerHTML = '<button class="save-signin-btn" onclick="signIn()">Sign in with Google to save score</button>';
+    saveEl.className = 'save-status';
+  }
 }
 
 function startGame() {
