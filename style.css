@@ -488,11 +488,22 @@ header {
   object-fit: cover;
 }
 
-.auth-name {
+.auth-name-btn {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
 }
+
+.auth-name-btn:hover { background: rgba(255,255,255,0.06); }
 
 .auth-signout-btn {
   padding: 5px 10px;
@@ -573,6 +584,82 @@ header {
 }
 
 .save-signin-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Nickname modal */
+.nickname-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.nickname-modal.visible { display: flex; }
+
+.nickname-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+
+.nickname-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.nickname-card p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.nickname-card input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+  margin-bottom: 8px;
+}
+
+.nickname-card input:focus { border-color: var(--accent); }
+
+.nickname-error {
+  font-size: 0.82rem;
+  color: var(--error);
+  min-height: 20px;
+  margin-bottom: 16px;
+}
+
+.nickname-submit {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.nickname-submit:hover { background: var(--accent-hover); }
+.nickname-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Leaderboard modal */
 .lb-modal {

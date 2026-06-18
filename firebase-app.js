@@ -3,18 +3,28 @@
 let _auth = null;
 let _db = null;
 let currentUser = null;
+let userNickname = null;
 
 function initFirebase() {
   _auth = firebase.auth();
   _db = firebase.firestore();
 
-  _auth.onAuthStateChanged(user => {
+  _auth.onAuthStateChanged(async user => {
     currentUser = user;
-    renderAuthUI(user);
+    if (user) {
+      await loadNickname(user.uid);
+    } else {
+      userNickname = null;
+      renderAuthUI(null);
+    }
   });
 
   document.getElementById('lb-modal').addEventListener('click', e => {
     if (e.target === document.getElementById('lb-modal')) closeLeaderboard();
+  });
+
+  document.getElementById('nickname-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitNickname();
   });
 }
 
@@ -24,7 +34,79 @@ function signIn() {
 }
 
 function signOutUser() {
+  userNickname = null;
   _auth.signOut();
+}
+
+async function loadNickname(uid) {
+  try {
+    const doc = await _db.collection('users').doc(uid).get();
+    if (doc.exists && doc.data().nickname) {
+      userNickname = doc.data().nickname;
+      renderAuthUI(currentUser);
+    } else {
+      // No nickname yet — prompt
+      showNicknameModal(false);
+    }
+  } catch (err) {
+    console.error('Failed to load nickname:', err);
+    showNicknameModal(false);
+  }
+}
+
+function showNicknameModal(isChange) {
+  const modal = document.getElementById('nickname-modal');
+  const title = document.getElementById('nickname-modal-title');
+  const input = document.getElementById('nickname-input');
+  const err = document.getElementById('nickname-error');
+
+  title.textContent = isChange ? 'Change your nickname' : 'Choose a nickname';
+  input.value = isChange && userNickname ? userNickname : '';
+  err.textContent = '';
+  modal.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  input.focus();
+}
+
+function changeNickname() {
+  showNicknameModal(true);
+}
+
+async function submitNickname() {
+  const input = document.getElementById('nickname-input');
+  const err = document.getElementById('nickname-error');
+  const nickname = input.value.trim();
+
+  if (nickname.length < 2) {
+    err.textContent = 'Must be at least 2 characters.';
+    return;
+  }
+  if (nickname.length > 20) {
+    err.textContent = 'Maximum 20 characters.';
+    return;
+  }
+  if (!/^[\w\s\-]+$/.test(nickname)) {
+    err.textContent = 'Letters, numbers, spaces, _ and - only.';
+    return;
+  }
+
+  const btn = document.getElementById('nickname-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    await _db.collection('users').doc(currentUser.uid).set({ nickname }, { merge: true });
+    userNickname = nickname;
+    document.getElementById('nickname-modal').classList.remove('visible');
+    document.body.style.overflow = '';
+    renderAuthUI(currentUser);
+  } catch (err2) {
+    console.error('Save nickname error:', err2);
+    document.getElementById('nickname-error').textContent = 'Could not save — try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save';
+  }
 }
 
 function renderAuthUI(user) {
@@ -36,8 +118,7 @@ function renderAuthUI(user) {
     const photo = document.getElementById('auth-photo');
     if (user.photoURL) { photo.src = user.photoURL; photo.style.display = 'block'; }
     else { photo.style.display = 'none'; }
-    document.getElementById('auth-name').textContent =
-      (user.displayName || 'User').split(' ')[0];
+    document.getElementById('auth-name').textContent = userNickname || '…';
   } else {
     signinBtn.style.display = 'flex';
     userWidget.style.display = 'none';
@@ -49,8 +130,7 @@ async function saveScore(score, total, pct, maxStreak) {
   try {
     await _db.collection('scores').add({
       uid: currentUser.uid,
-      displayName: currentUser.displayName || 'Anonymous',
-      photoURL: currentUser.photoURL || null,
+      nickname: userNickname || currentUser.displayName || 'Anonymous',
       score,
       total,
       pct,
@@ -112,13 +192,14 @@ function renderLeaderboardData(scores, myBest) {
   } else {
     body.innerHTML = scores.map((s, i) => {
       const isMe = s.uid === myUid;
-      const initials = (s.displayName || '?').split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
+      const name = s.nickname || s.displayName || 'Anonymous';
+      const initials = name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
       const rank = medals[i] || `${i + 1}`;
       return `
         <div class="lb-row${isMe ? ' lb-row-me' : ''}">
           <span class="lb-rank">${rank}</span>
           <span class="lb-avatar">${initials}</span>
-          <span class="lb-name">${escHtml(s.displayName || 'Anonymous')}${isMe ? ' <span class="lb-you">(you)</span>' : ''}</span>
+          <span class="lb-name">${escHtml(name)}${isMe ? ' <span class="lb-you">(you)</span>' : ''}</span>
           <span class="lb-pct">${s.pct}%</span>
           <span class="lb-words">${s.score}/${s.total}</span>
         </div>`;

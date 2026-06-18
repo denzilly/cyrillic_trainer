@@ -24,7 +24,7 @@
           <button class="auth-signin-btn" id="auth-signin-btn" onclick="signIn()">Sign in</button>
           <div class="auth-user-widget" id="auth-user-widget" style="display:none">
             <img class="auth-photo" id="auth-photo" src="" alt="">
-            <span class="auth-name" id="auth-name"></span>
+            <button class="auth-name-btn" id="auth-name" onclick="changeNickname()" title="Change nickname"></button>
             <button class="auth-signout-btn" onclick="signOutUser()">Sign out</button>
           </div>
         </div>
@@ -92,6 +92,26 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Nickname Modal -->
+  <div class="nickname-modal" id="nickname-modal">
+    <div class="nickname-card">
+      <h3 id="nickname-modal-title">Choose a nickname</h3>
+      <p>This is what appears on the leaderboard — your real name stays private.</p>
+      <input
+        type="text"
+        id="nickname-input"
+        placeholder="e.g. CoolLearner99"
+        maxlength="20"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
+      <div class="nickname-error" id="nickname-error"></div>
+      <button class="nickname-submit" id="nickname-submit-btn" onclick="submitNickname()">Save</button>
+    </div>
   </div>
 
   <!-- Leaderboard Modal -->
