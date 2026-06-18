@@ -45,57 +45,62 @@ function isCorrect(input, word) {
 
 function buildCategoryFilters() {
   const categories = [...new Set(WORDS.map(w => w.category))].sort();
-  const group = document.querySelector('.filter-group');
-
-  const allBtn = document.createElement('button');
-  allBtn.className = 'filter-btn active';
-  allBtn.textContent = 'All';
-  allBtn.dataset.cat = '__all__';
-  group.appendChild(allBtn);
+  const container = document.getElementById('wordlist-categories');
 
   categories.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'filter-btn';
+    btn.className = 'cat-btn active';
     btn.textContent = cat;
     btn.dataset.cat = cat;
-    group.appendChild(btn);
+    container.appendChild(btn);
   });
 
   activeCategories = new Set(categories);
 
-  group.addEventListener('click', e => {
-    const btn = e.target.closest('.filter-btn');
+  container.addEventListener('click', e => {
+    const btn = e.target.closest('.cat-btn');
     if (!btn) return;
     const cat = btn.dataset.cat;
-
-    if (cat === '__all__') {
-      if (activeCategories.size === categories.length) {
-        // deselect all → keep all active (can't have nothing)
-        return;
-      }
-      activeCategories = new Set(categories);
-      group.querySelectorAll('.filter-btn').forEach(b => b.classList.add('active'));
+    if (activeCategories.has(cat)) {
+      if (activeCategories.size === 1) return;
+      activeCategories.delete(cat);
+      btn.classList.remove('active');
     } else {
-      const allBtnEl = group.querySelector('[data-cat="__all__"]');
-      if (activeCategories.has(cat)) {
-        activeCategories.delete(cat);
-        btn.classList.remove('active');
-        allBtnEl.classList.remove('active');
-      } else {
-        activeCategories.add(cat);
-        btn.classList.add('active');
-        if (activeCategories.size === categories.length) {
-          allBtnEl.classList.add('active');
-        }
-      }
-      if (activeCategories.size === 0) {
-        activeCategories.add(cat);
-        btn.classList.add('active');
-      }
+      activeCategories.add(cat);
+      btn.classList.add('active');
     }
-
-    startGame();
+    updateWordListUI();
   });
+}
+
+function updateWordListUI() {
+  const count = WORDS.filter(w => activeCategories.has(w.category)).length;
+  document.getElementById('wordlist-count').textContent = `${count} words`;
+}
+
+let _categoriesOnOpen = null;
+
+function openWordList() {
+  _categoriesOnOpen = new Set(activeCategories);
+  updateWordListUI();
+  document.getElementById('wordlist-modal').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeWordList() {
+  document.getElementById('wordlist-modal').classList.remove('visible');
+  document.body.style.overflow = '';
+  const changed = _categoriesOnOpen &&
+    (_categoriesOnOpen.size !== activeCategories.size ||
+     [...activeCategories].some(c => !_categoriesOnOpen.has(c)));
+  if (changed) startGame();
+  _categoriesOnOpen = null;
+}
+
+function selectAllCategories() {
+  activeCategories = new Set([...new Set(WORDS.map(w => w.category))]);
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.add('active'));
+  updateWordListUI();
 }
 
 function buildAlphabetRef() {
@@ -276,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const panel = document.querySelector('.ref-panel');
     const btn = $('ref-toggle-btn');
     const visible = panel.classList.toggle('visible');
-    btn.textContent = visible ? 'Hide alphabet' : 'Alphabet reference';
+    btn.textContent = visible ? '✕ Alphabet' : 'Аа Alphabet';
   });
 
   $('answer-input').addEventListener('keydown', e => {

@@ -32,11 +32,9 @@
     </header>
 
     <div class="toolbar">
-      <div class="filter-group"></div>
-      <div class="toolbar-btns">
-        <button class="ref-toggle-btn" id="ref-toggle-btn">Alphabet</button>
-        <button class="lb-btn" onclick="openLeaderboard()">🏆 Leaderboard</button>
-      </div>
+      <button class="toolbar-btn" onclick="openWordList()">📚 Word list</button>
+      <button class="toolbar-btn" id="ref-toggle-btn">Аа Alphabet</button>
+      <button class="toolbar-btn" onclick="openLeaderboard()">🏆 Leaderboard</button>
     </div>
 
     <div class="ref-panel">
@@ -92,6 +90,24 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- Word List Modal -->
+  <div class="wordlist-modal" id="wordlist-modal">
+    <div class="wordlist-card">
+      <div class="wordlist-header">
+        <span>📚 Word Categories</span>
+        <button class="lb-close" onclick="closeWordList()">✕</button>
+      </div>
+      <div class="wordlist-subheader">
+        <span id="wordlist-count"></span>
+        <button class="wordlist-selectall" onclick="selectAllCategories()">Select all</button>
+      </div>
+      <div class="wordlist-categories" id="wordlist-categories"></div>
+      <div class="wordlist-footer">
+        <button class="wordlist-done" onclick="closeWordList()">Done</button>
+      </div>
+    </div>
   </div>
 
   <!-- Nickname Modal -->
