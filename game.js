@@ -159,6 +159,7 @@ function submitAnswer() {
     $('result-details').innerHTML = `<span class="correct-answer">"${word.transliteration}"</span>`;
   } else {
     streak = 0;
+    if (maxStreak > 0) saveStreak(maxStreak); // save silently the moment the streak breaks
     $('result-status').textContent = '✗ Not quite';
     $('result-status').className = 'result-status incorrect';
     $('result-details').innerHTML =
