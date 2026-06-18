@@ -169,7 +169,6 @@ function submitAnswer() {
     `<span class="label">English</span><span class="value">${word.english}</span>`;
 
   updateStats();
-  $('next-btn').focus();
 }
 
 function nextWord() {
