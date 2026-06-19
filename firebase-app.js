@@ -116,11 +116,12 @@ function renderAuthUI(user) {
 }
 
 // Returns 'not-signed-in' | 'skipped' | 'new-record' | 'no-change' | 'error'
-async function saveStreak(streak) {
+async function saveStreak(streak, lang) {
   if (!currentUser) return 'not-signed-in';
   if (streak === 0) return 'skipped';
+  const collection = `streaks_${lang || 'ru'}`;
 
-  const ref = _db.collection('streaks').doc(currentUser.uid);
+  const ref = _db.collection(collection).doc(currentUser.uid);
   try {
     const doc = await ref.get();
     const prevBest = doc.exists ? (doc.data().bestStreak || 0) : 0;
@@ -140,14 +141,20 @@ async function saveStreak(streak) {
   }
 }
 
-async function openLeaderboard() {
+async function openLeaderboard(lang) {
+  lang = lang || 'ru';
+  const collection = `streaks_${lang}`;
+  const langName = (typeof LANGUAGES !== 'undefined' && LANGUAGES[lang])
+    ? LANGUAGES[lang].name : 'Global';
+
   document.getElementById('lb-modal').classList.add('visible');
   document.body.style.overflow = 'hidden';
+  document.getElementById('lb-header-title').textContent = `🏆 ${langName} Leaderboard`;
   document.getElementById('lb-body').innerHTML = '<div class="lb-empty">Loading…</div>';
   document.getElementById('lb-personal').innerHTML = '';
 
   try {
-    const snapshot = await _db.collection('streaks')
+    const snapshot = await _db.collection(collection)
       .orderBy('bestStreak', 'desc')
       .limit(10)
       .get();

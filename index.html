@@ -10,7 +10,7 @@
   <div class="app">
 
     <header>
-      <div class="title">Cyrillic <span>→</span> Latin Trainer</div>
+      <div class="title">Russian <span>→</span> Latin Trainer</div>
       <div class="header-right">
         <div class="stats">
           <div class="stat">
@@ -31,10 +31,15 @@
       </div>
     </header>
 
+    <div class="lang-selector">
+      <button class="lang-btn active" data-lang="ru">🇷🇺 Russian</button>
+      <button class="lang-btn" data-lang="el">🇬🇷 Greek</button>
+    </div>
+
     <div class="toolbar">
       <button class="toolbar-btn" onclick="openWordList()">📚 Word list</button>
       <button class="toolbar-btn" id="ref-toggle-btn">Аа Alphabet</button>
-      <button class="toolbar-btn" onclick="openLeaderboard()">🏆 Leaderboard</button>
+      <button class="toolbar-btn" onclick="openLeaderboard(currentLang)">🏆 Leaderboard</button>
     </div>
 
     <div class="ref-panel">
@@ -86,7 +91,7 @@
       <div class="save-status" id="save-status"></div>
       <div class="end-btns">
         <button id="restart-btn">Play Again</button>
-        <button class="lb-btn-end" onclick="openLeaderboard()">🏆 Leaderboard</button>
+        <button class="lb-btn-end" onclick="openLeaderboard(currentLang)">🏆 Leaderboard</button>
       </div>
     </div>
 
@@ -134,7 +139,7 @@
   <div class="lb-modal" id="lb-modal">
     <div class="lb-card">
       <div class="lb-header">
-        <span>🏆 Global Leaderboard</span>
+        <span id="lb-header-title">🏆 Russian Leaderboard</span>
         <button class="lb-close" onclick="closeLeaderboard()">✕</button>
       </div>
       <div class="lb-cols">
@@ -153,7 +158,8 @@
 
   <script src="firebase-config.js"></script>
   <script src="firebase-app.js"></script>
-  <script src="words.js"></script>
+  <script src="words_ru.js"></script>
+  <script src="words_el.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

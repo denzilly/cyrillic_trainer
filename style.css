@@ -10,6 +10,8 @@
   --surface2: #374151;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
+  --accent-bg: rgba(99, 102, 241, 0.12);
+  --accent-bg-light: rgba(99, 102, 241, 0.08);
   --success: #22c55e;
   --error: #ef4444;
   --text: #f9fafb;
@@ -74,6 +76,37 @@ header {
 
 .stat-value.streak {
   color: #f59e0b;
+}
+
+/* Language Selector */
+.lang-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.lang-btn {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.lang-btn:hover {
+  color: var(--text);
+  border-color: var(--surface2);
+}
+
+.lang-btn.active {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--accent-bg);
 }
 
 /* Toolbar */
@@ -188,7 +221,7 @@ header {
 }
 
 .cat-btn.active {
-  background: rgba(99, 102, 241, 0.12);
+  background: var(--accent-bg);
   border-color: var(--accent);
   color: var(--text);
   font-weight: 600;
@@ -302,7 +335,7 @@ header {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--accent);
-  background: rgba(99, 102, 241, 0.12);
+  background: var(--accent-bg);
   padding: 3px 10px;
   border-radius: 20px;
   margin-bottom: 20px;
@@ -830,8 +863,8 @@ header {
 
 .lb-row:hover { background: rgba(255,255,255,0.03); }
 
-.lb-row-me { background: rgba(99, 102, 241, 0.08); }
-.lb-row-me:hover { background: rgba(99, 102, 241, 0.12); }
+.lb-row-me { background: var(--accent-bg-light); }
+.lb-row-me:hover { background: var(--accent-bg); }
 
 .lb-rank { font-size: 1rem; }
 

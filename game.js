@@ -1,17 +1,35 @@
 'use strict';
 
-const ALPHABET_REF = [
-  ['А а', 'a'],  ['Б б', 'b'],   ['В в', 'v'],   ['Г г', 'g'],
-  ['Д д', 'd'],  ['Е е', 'ye/e'],['Ё ё', 'yo'],  ['Ж ж', 'zh'],
-  ['З з', 'z'],  ['И и', 'i'],   ['Й й', 'y'],   ['К к', 'k'],
-  ['Л л', 'l'],  ['М м', 'm'],   ['Н н', 'n'],   ['О о', 'o'],
-  ['П п', 'p'],  ['Р р', 'r'],   ['С с', 's'],   ['Т т', 't'],
-  ['У у', 'u'],  ['Ф ф', 'f'],   ['Х х', 'kh'],  ['Ц ц', 'ts'],
-  ['Ч ч', 'ch'], ['Ш ш', 'sh'],  ['Щ щ', 'shch'],['Ъ ъ', '(–)'],
-  ['Ы ы', 'y'],  ['Ь ь', '(–)'], ['Э э', 'e'],   ['Ю ю', 'yu'],
-  ['Я я', 'ya'],
-];
+const LANGUAGES = {
+  ru: {
+    name: 'Russian',
+    flag: '🇷🇺',
+    accent: '#6366f1',
+    accentHover: '#4f46e5',
+    accentBg: 'rgba(99, 102, 241, 0.12)',
+    accentBgLight: 'rgba(99, 102, 241, 0.08)',
+    words: WORDS_RU,
+    alphabetRef: ALPHABET_REF_RU,
+    streakCollection: 'streaks_ru',
+    refTitle: 'Cyrillic Alphabet Transliteration Guide',
+    refBtnLabel: 'Аа',
+  },
+  el: {
+    name: 'Greek',
+    flag: '🇬🇷',
+    accent: '#3b82f6',
+    accentHover: '#2563eb',
+    accentBg: 'rgba(59, 130, 246, 0.12)',
+    accentBgLight: 'rgba(59, 130, 246, 0.08)',
+    words: WORDS_EL,
+    alphabetRef: ALPHABET_REF_EL,
+    streakCollection: 'streaks_el',
+    refTitle: 'Greek Alphabet Transliteration Guide',
+    refBtnLabel: 'Αα',
+  },
+};
 
+let currentLang = 'ru';
 let allWords = [];
 let queue = [];
 let currentIndex = 0;
@@ -43,20 +61,8 @@ function isCorrect(input, word) {
   return word.alternates.some(a => n === normalize(a));
 }
 
-function buildCategoryFilters() {
-  const categories = [...new Set(WORDS.map(w => w.category))].sort();
+function initCategoryFilters() {
   const container = document.getElementById('wordlist-categories');
-
-  categories.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className = 'cat-btn active';
-    btn.textContent = cat;
-    btn.dataset.cat = cat;
-    container.appendChild(btn);
-  });
-
-  activeCategories = new Set(categories);
-
   container.addEventListener('click', e => {
     const btn = e.target.closest('.cat-btn');
     if (!btn) return;
@@ -73,8 +79,26 @@ function buildCategoryFilters() {
   });
 }
 
+function buildCategoryFilters() {
+  const lang = LANGUAGES[currentLang];
+  const categories = [...new Set(lang.words.map(w => w.category))].sort();
+  const container = document.getElementById('wordlist-categories');
+  container.innerHTML = '';
+
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn active';
+    btn.textContent = cat;
+    btn.dataset.cat = cat;
+    container.appendChild(btn);
+  });
+
+  activeCategories = new Set(categories);
+}
+
 function updateWordListUI() {
-  const count = WORDS.filter(w => activeCategories.has(w.category)).length;
+  const lang = LANGUAGES[currentLang];
+  const count = lang.words.filter(w => activeCategories.has(w.category)).length;
   document.getElementById('wordlist-count').textContent = `${count} words`;
 }
 
@@ -98,19 +122,60 @@ function closeWordList() {
 }
 
 function selectAllCategories() {
-  activeCategories = new Set([...new Set(WORDS.map(w => w.category))]);
+  const lang = LANGUAGES[currentLang];
+  activeCategories = new Set([...new Set(lang.words.map(w => w.category))]);
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.add('active'));
   updateWordListUI();
 }
 
 function buildAlphabetRef() {
+  const lang = LANGUAGES[currentLang];
   const grid = document.querySelector('.ref-grid');
-  ALPHABET_REF.forEach(([cyr, lat]) => {
+  const title = document.querySelector('.ref-panel h3');
+  grid.innerHTML = '';
+  title.textContent = lang.refTitle;
+  lang.alphabetRef.forEach(([script, lat]) => {
     const item = document.createElement('div');
     item.className = 'ref-item';
-    item.innerHTML = `<span class="ref-cyr">${cyr}</span><span class="ref-lat">= ${lat}</span>`;
+    item.innerHTML = `<span class="ref-cyr">${script}</span><span class="ref-lat">= ${lat}</span>`;
     grid.appendChild(item);
   });
+}
+
+function applyLanguageTheme(lang) {
+  const config = LANGUAGES[lang];
+  const root = document.documentElement;
+  root.style.setProperty('--accent', config.accent);
+  root.style.setProperty('--accent-hover', config.accentHover);
+  root.style.setProperty('--accent-bg', config.accentBg);
+  root.style.setProperty('--accent-bg-light', config.accentBgLight);
+}
+
+function switchLanguage(lang) {
+  if (lang === currentLang) return;
+  currentLang = lang;
+
+  const config = LANGUAGES[lang];
+  applyLanguageTheme(lang);
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  document.querySelector('.title').innerHTML =
+    `${config.name} <span>→</span> Latin Trainer`;
+
+  const refPanel = document.querySelector('.ref-panel');
+  if (refPanel.classList.contains('visible')) {
+    refPanel.classList.remove('visible');
+    $('ref-toggle-btn').textContent = `${config.refBtnLabel} Alphabet`;
+  } else {
+    $('ref-toggle-btn').textContent = `${config.refBtnLabel} Alphabet`;
+  }
+
+  buildAlphabetRef();
+  buildCategoryFilters();
+  startGame();
 }
 
 function updateStats() {
@@ -125,7 +190,7 @@ function showWord() {
 
   const word = queue[currentIndex];
   $('category-badge').textContent = word.category;
-  $('russian-word').textContent = word.russian;
+  $('russian-word').textContent = word.word;
   $('answer-input').value = '';
   $('answer-input').disabled = false;
   $('submit-btn').disabled = false;
@@ -164,7 +229,7 @@ function submitAnswer() {
     $('result-details').innerHTML = `<span class="correct-answer">"${word.transliteration}"</span>`;
   } else {
     streak = 0;
-    if (maxStreak > 0) saveStreak(maxStreak); // save silently the moment the streak breaks
+    if (maxStreak > 0) saveStreak(maxStreak, currentLang);
     $('result-status').textContent = '✗ Not quite';
     $('result-status').className = 'result-status incorrect';
     $('result-details').innerHTML =
@@ -210,7 +275,7 @@ async function showEndScreen() {
   if (currentUser) {
     saveEl.textContent = 'Saving…';
     saveEl.className = 'save-status saving';
-    const result = await saveStreak(maxStreak);
+    const result = await saveStreak(maxStreak, currentLang);
     if (result === 'new-record') {
       saveEl.textContent = `🏆 New personal best: ${maxStreak} streak!`;
       saveEl.className = 'save-status saved';
@@ -230,7 +295,8 @@ async function showEndScreen() {
 }
 
 function startGame() {
-  const filtered = WORDS.filter(w => activeCategories.has(w.category));
+  const lang = LANGUAGES[currentLang];
+  const filtered = lang.words.filter(w => activeCategories.has(w.category));
   queue = shuffle(filtered);
   currentIndex = 0;
   score = 0;
@@ -265,6 +331,8 @@ function toggleHint() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  applyLanguageTheme(currentLang);
+  initCategoryFilters();
   buildCategoryFilters();
   buildAlphabetRef();
 
@@ -280,8 +348,13 @@ document.addEventListener('DOMContentLoaded', () => {
   $('ref-toggle-btn').addEventListener('click', () => {
     const panel = document.querySelector('.ref-panel');
     const btn = $('ref-toggle-btn');
+    const config = LANGUAGES[currentLang];
     const visible = panel.classList.toggle('visible');
-    btn.textContent = visible ? '✕ Alphabet' : 'Аа Alphabet';
+    btn.textContent = visible ? `✕ Alphabet` : `${config.refBtnLabel} Alphabet`;
+  });
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchLanguage(btn.dataset.lang));
   });
 
   $('answer-input').addEventListener('keydown', e => {
