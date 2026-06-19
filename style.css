@@ -138,6 +138,18 @@ header {
   border-color: var(--text-muted);
 }
 
+.toolbar-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Word list modal */
 .wordlist-modal {
   display: none;

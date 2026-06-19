@@ -65,6 +65,7 @@ let maxStreak = 0;
 let hintVisible = false;
 let activeCategories = new Set();
 let answered = false;
+let letterMode = false;
 
 const $ = id => document.getElementById(id);
 
@@ -227,7 +228,9 @@ function showWord() {
 
   const pct = (currentIndex / queue.length) * 100;
   $('progress').style.width = pct + '%';
-  $('word-count').textContent = `Word ${currentIndex + 1} of ${queue.length}`;
+  $('word-count').textContent = letterMode
+    ? `Letter ${currentIndex + 1} of ${queue.length}`
+    : `Word ${currentIndex + 1} of ${queue.length}`;
 
   updateStats();
   $('answer-input').focus();
@@ -255,15 +258,16 @@ function submitAnswer() {
     $('result-details').innerHTML = `<span class="correct-answer">"${word.transliteration}"</span>`;
   } else {
     streak = 0;
-    if (maxStreak > 0) saveStreak(maxStreak, currentLang);
+    if (maxStreak > 0 && !letterMode) saveStreak(maxStreak, currentLang);
     $('result-status').textContent = '✗ Not quite';
     $('result-status').className = 'result-status incorrect';
     $('result-details').innerHTML =
       `Your answer: "${input}" &nbsp;·&nbsp; Correct: <span class="correct-answer">"${word.transliteration}"</span>`;
   }
 
+  const meaningLabel = letterMode ? 'Sound' : 'English';
   $('english-meaning').innerHTML =
-    `<span class="label">English</span><span class="value">${word.english}</span>`;
+    `<span class="label">${meaningLabel}</span><span class="value">${word.english}</span>`;
 
   updateStats();
 }
@@ -298,7 +302,10 @@ async function showEndScreen() {
   $('final-msg').textContent = msg;
 
   const saveEl = $('save-status');
-  if (currentUser) {
+  if (letterMode) {
+    saveEl.textContent = 'Letter practice mode — streaks not counted.';
+    saveEl.className = 'save-status';
+  } else if (currentUser) {
     saveEl.textContent = 'Saving…';
     saveEl.className = 'save-status saving';
     const result = await saveStreak(maxStreak, currentLang);
@@ -314,16 +321,47 @@ async function showEndScreen() {
       saveEl.textContent = '✗ Could not save streak.';
       saveEl.className = 'save-status save-error';
     }
-  } else {
+  } else if (!letterMode) {
     saveEl.innerHTML = '<button class="save-signin-btn" onclick="signIn()">Sign in to save your streak</button>';
     saveEl.className = 'save-status';
   }
 }
 
+function buildLetterQueue() {
+  const lang = LANGUAGES[currentLang];
+  return shuffle(
+    lang.alphabetRef
+      .filter(([, lat]) => !lat.includes('–'))
+      .map(([script, lat]) => {
+        const parts = lat.split('/').map(p => p.trim());
+        return {
+          word: script,
+          transliteration: parts[0],
+          alternates: parts.slice(1),
+          english: lat,
+          category: 'Letter',
+        };
+      })
+      .filter(e => e.transliteration)
+  );
+}
+
+function toggleLetterMode() {
+  letterMode = !letterMode;
+  const btn = $('letter-mode-btn');
+  btn.classList.toggle('active', letterMode);
+  $('wordlist-btn').disabled = letterMode;
+  startGame();
+}
+
 function startGame() {
   const lang = LANGUAGES[currentLang];
-  const filtered = lang.words.filter(w => activeCategories.has(w.category));
-  queue = shuffle(filtered);
+  if (letterMode) {
+    queue = buildLetterQueue();
+  } else {
+    const filtered = lang.words.filter(w => activeCategories.has(w.category));
+    queue = shuffle(filtered);
+  }
   currentIndex = 0;
   score = 0;
   streak = 0;
@@ -331,7 +369,7 @@ function startGame() {
   answered = false;
 
   $('game-card').style.display = '';
-  $('hint-area').style.display = '';
+  $('hint-area').style.display = letterMode ? 'none' : '';
   $('end-screen').classList.add('hidden');
   $('progress').style.width = '0%';
 
@@ -382,6 +420,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => switchLanguage(btn.dataset.lang));
   });
+
+  $('letter-mode-btn').addEventListener('click', toggleLetterMode);
 
   $('answer-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
