@@ -953,4 +953,24 @@ header {
   .auth-name { display: none; }
   .input-area { flex-direction: column; }
   #submit-btn { width: 100%; }
+
+  /* Toolbar: even 2×2 grid matching the language selector */
+  .toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .toolbar-btn {
+    text-align: center;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+
+  /* Language selector: slightly smaller text so flags + names fit */
+  .lang-btn {
+    font-size: 0.82rem;
+    padding: 9px 8px;
+    min-width: 0;
+  }
 }
