@@ -27,6 +27,32 @@ const LANGUAGES = {
     refTitle: 'Greek Alphabet Transliteration Guide',
     refBtnLabel: 'Αα',
   },
+  ko: {
+    name: 'Korean',
+    flag: '🇰🇷',
+    accent: '#10b981',
+    accentHover: '#059669',
+    accentBg: 'rgba(16, 185, 129, 0.12)',
+    accentBgLight: 'rgba(16, 185, 129, 0.08)',
+    words: WORDS_KO,
+    alphabetRef: ALPHABET_REF_KO,
+    streakCollection: 'streaks_ko',
+    refTitle: 'Korean Hangul Guide',
+    refBtnLabel: '한글',
+  },
+  ja: {
+    name: 'Japanese',
+    flag: '🇯🇵',
+    accent: '#f43f5e',
+    accentHover: '#e11d48',
+    accentBg: 'rgba(244, 63, 94, 0.12)',
+    accentBgLight: 'rgba(244, 63, 94, 0.08)',
+    words: WORDS_JA,
+    alphabetRef: ALPHABET_REF_JA,
+    streakCollection: 'streaks_ja',
+    refTitle: 'Japanese Hiragana Guide',
+    refBtnLabel: 'かな',
+  },
 };
 
 let currentLang = 'ru';
