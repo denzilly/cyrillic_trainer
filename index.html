@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Russian Transliteration Trainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -56,21 +59,27 @@
     <div class="word-count" id="word-count">Word 1 of …</div>
 
     <div class="card" id="game-card">
-      <div class="category-badge" id="category-badge">Category</div>
-      <div class="russian-word" id="russian-word">…</div>
+      <div class="word-panel">
+        <div class="category-badge" id="category-badge">Category</div>
+        <div class="word-label" id="word-label">Transliterate this word</div>
+        <div class="russian-word" id="russian-word">…</div>
+      </div>
 
       <div class="input-area">
         <input
           type="text"
           id="answer-input"
-          placeholder="Type the transliteration…"
+          placeholder="Type the English characters…"
           autocomplete="off"
           autocorrect="off"
           autocapitalize="off"
           spellcheck="false"
         >
-        <button id="submit-btn">Check</button>
       </div>
+
+      <button class="submit-hint" id="submit-btn">
+        <span class="hint-key">↵</span> Press Enter to check
+      </button>
 
       <div class="result hidden" id="result">
         <div class="result-status" id="result-status"></div>

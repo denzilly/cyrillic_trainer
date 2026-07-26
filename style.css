@@ -340,8 +340,18 @@ header {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 36px 40px;
+  padding: 44px 40px 32px;
   margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.word-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .category-badge {
@@ -354,35 +364,55 @@ header {
   background: var(--accent-bg);
   padding: 3px 10px;
   border-radius: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
+}
+
+.word-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--label-color, #b8a68c);
+  margin-bottom: 22px;
 }
 
 .russian-word {
-  font-size: 3.8rem;
-  font-weight: 800;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 4.4rem;
+  font-weight: 900;
   letter-spacing: 1px;
   color: var(--text);
-  margin-bottom: 28px;
+  margin-bottom: 8px;
   line-height: 1.15;
-  word-break: break-all;
+  overflow-wrap: break-word;
+  text-shadow:
+    -2.5px 0 rgba(239, 68, 68, 0.5),
+    2.5px 0 rgba(96, 165, 250, 0.5);
 }
 
 /* Input */
 .input-area {
-  display: flex;
-  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+  margin: 34px 0 18px;
 }
 
 #answer-input {
-  flex: 1;
-  padding: 13px 16px;
-  background: var(--bg);
-  border: 2px solid var(--border);
-  border-radius: 10px;
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 14px;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 1.05rem;
+  text-align: center;
   outline: none;
   transition: border-color 0.2s;
+}
+
+#answer-input::placeholder {
+  font-style: italic;
+  color: var(--text-muted);
 }
 
 #answer-input:focus {
@@ -393,33 +423,52 @@ header {
   opacity: 0.6;
 }
 
-#submit-btn {
-  padding: 13px 22px;
-  background: var(--accent);
-  color: white;
+/* Submit hint (replaces the old Check button) */
+.submit-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
   border: none;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-size: 0.72rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   cursor: pointer;
-  transition: background 0.15s;
-  white-space: nowrap;
+  padding: 6px 10px;
+  transition: color 0.15s, opacity 0.15s;
 }
 
-#submit-btn:hover {
-  background: var(--accent-hover);
+.submit-hint:hover {
+  color: var(--text);
 }
 
-#submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.submit-hint:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hint-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 0.78rem;
 }
 
 /* Result */
 .result {
+  width: 100%;
+  max-width: 420px;
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid var(--border);
+  text-align: left;
 }
 
 .result.hidden {
@@ -945,14 +994,13 @@ header {
 
 /* Responsive */
 @media (max-width: 500px) {
-  .card { padding: 24px 16px; }
-  .russian-word { font-size: 2.8rem; }
+  .card { padding: 32px 20px 24px; }
+  .russian-word { font-size: 2.6rem; }
+  .word-label { letter-spacing: 2px; }
   header { flex-direction: column; align-items: flex-start; gap: 10px; }
   .header-right { flex-direction: column; align-items: flex-start; gap: 8px; }
   .stats { gap: 16px; }
   .auth-name { display: none; }
-  .input-area { flex-direction: column; }
-  #submit-btn { width: 100%; }
 
   /* Toolbar: even 2×2 grid matching the language selector */
   .toolbar {

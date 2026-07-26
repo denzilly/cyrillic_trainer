@@ -217,6 +217,7 @@ function showWord() {
 
   const word = queue[currentIndex];
   $('category-badge').textContent = word.category;
+  $('word-label').textContent = letterMode ? 'Transliterate this letter' : 'Transliterate this word';
   $('russian-word').textContent = word.word;
   $('answer-input').value = '';
   $('answer-input').disabled = false;
