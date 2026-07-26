@@ -328,13 +328,6 @@ header {
   transition: width 0.4s ease;
 }
 
-.word-count {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  text-align: right;
-  margin-bottom: 20px;
-}
-
 /* Card */
 .card {
   background: var(--surface);

@@ -229,9 +229,6 @@ function showWord() {
 
   const pct = (currentIndex / queue.length) * 100;
   $('progress').style.width = pct + '%';
-  $('word-count').textContent = letterMode
-    ? `Letter ${currentIndex + 1} of ${queue.length}`
-    : `Word ${currentIndex + 1} of ${queue.length}`;
 
   updateStats();
   $('answer-input').focus();
